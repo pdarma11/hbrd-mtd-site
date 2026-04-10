@@ -33,7 +33,7 @@ const META = {
   },
   '/contact': {
     title: 'Contact — Prendre rendez-vous | HBRD MTD',
-    description: 'Une question sur nos programmes ? Contacte Alex directement. Réponse garantie sous 24h.',
+    description: 'Une question sur nos programmes ? Contacte Péryk directement. Réponse garantie sous 24h.',
     keywords: 'contact coach sportif, rendez-vous coaching',
   },
   '/musculation': {

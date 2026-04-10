@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, HelpCircle } from 'lucide-react'
 
 const faqs = [
-  { q: 'Comment fonctionne le coaching en ligne ?', a: 'Après ta souscription, tu reçois un questionnaire de bilan. En 24-48h, Alex t\'envoie ton programme personnalisé dans ton espace client. Tu peux échanger avec lui via messagerie.' },
+  { q: 'Comment fonctionne le coaching en ligne ?', a: 'Après ta souscription, tu reçois un questionnaire de bilan. En 24-48h, Péryk t\'envoie ton programme personnalisé dans ton espace client. Tu peux échanger avec lui via messagerie.' },
   { q: 'Faut-il une salle de sport ?', a: 'Ça dépend de ton programme. La plupart des programmes musculation nécessitent une salle. Les programmes running et certains programmes full body sont réalisables à domicile.' },
   { q: 'Puis-je annuler mon abonnement ?', a: 'Oui, tu peux annuler à tout moment depuis ton espace client. L\'annulation prend effet à la fin de la période en cours. Aucune question, aucun frais.' },
   { q: 'Y a-t-il une garantie satisfaction ?', a: 'Oui. Si tu n\'es pas satisfait dans les 14 premiers jours, tu es remboursé intégralement sans condition.' },

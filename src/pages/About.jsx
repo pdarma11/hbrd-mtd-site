@@ -28,8 +28,8 @@ export default function About() {
           <motion.div {...fadeUp}>
             <span className="section-label mb-6 inline-flex"><Zap size={12} />À propos</span>
             <h1 className="font-anton text-6xl md:text-8xl tracking-wider mb-6">
-              ALEX<br />
-              <span className="gradient-text">DUPONT</span>
+              PÉRYK<br />
+              <span className="gradient-text">DARMALINGON</span>
             </h1>
             <p className="text-xl max-w-2xl leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
               Coach sportif certifié, spécialiste de la méthode hybride et fondateur de HBRD MTD.
