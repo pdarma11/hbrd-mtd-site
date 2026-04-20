@@ -318,13 +318,13 @@ export const disciplinePricing = {
   ],
   'hybrid-athlete': [
     { id: 'starter',   price: '9,99',   period: 'mois',    desc: 'Accès à la bibliothèque d\'exercices hybrides et suivi de progression.' },
-    { id: 'monthly',   price: '79',     period: 'mois',    desc: 'Programme hybride force + endurance, conçu pour l\'athlète complet.' },
-    { id: 'quarterly', price: '199',    period: '3 mois',  desc: 'Développement hybride intensif sur 12 semaines : VO2max, force et cardio.' },
+    { id: 'monthly',   price: '79,99',  period: 'mois',    desc: 'Programme hybride force + endurance, conçu pour l\'athlète complet.' },
+    { id: 'quarterly', price: '199,99', period: '3 mois',  desc: 'Développement hybride intensif sur 12 semaines : VO2max, force et cardio.' },
   ],
   hyrox: [
     { id: 'starter',   price: '9,99',   period: 'mois',    desc: 'Accès aux ressources HYROX et suivi de tes performances aux stations.' },
-    { id: 'monthly',   price: '99',     period: 'mois',    desc: 'Préparation HYROX mensuelle : 8 stations, 8km course, cardio-résistance.' },
-    { id: 'quarterly', price: '299',    period: '3 mois',  desc: 'Préparation compétition HYROX complète sur 12 semaines, garantie résultats.' },
+    { id: 'monthly',   price: '99,99',  period: 'mois',    desc: 'Préparation HYROX mensuelle : 8 stations, 8km course, cardio-résistance.' },
+    { id: 'quarterly', price: '299,99', period: '3 mois',  desc: 'Préparation compétition HYROX complète sur 12 semaines, garantie résultats.' },
   ],
 }
 
