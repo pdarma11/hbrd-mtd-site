@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { HelpCircle, ArrowRight, ArrowLeft, CheckCircle2, RotateCcw } from 'lucide-react'
+import { HelpCircle, ArrowRight, ArrowLeft, CheckCircle2, RotateCcw, Star, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { subscriptions } from '../data/mockData'
 
 const QUESTIONS = [
   {
@@ -36,7 +37,7 @@ const QUESTIONS = [
   },
   {
     id: 4,
-    question: 'Quel type d\'entraînement préfères-tu ?',
+    question: "Quel type d'entraînement préfères-tu ?",
     options: [
       { label: 'Salle de sport uniquement', value: 'salle', icon: '🏋️' },
       { label: 'Running / Cardio outdoor', value: 'running', icon: '🏃' },
@@ -51,7 +52,7 @@ const QUESTIONS = [
       { label: 'Moins de 50€ / mois', value: 'basic', icon: '💰' },
       { label: '50-100€ / mois', value: 'pro', icon: '💰' },
       { label: '+100€ / mois', value: 'premium', icon: '💎' },
-      { label: 'Le budget n\'est pas une limite', value: 'premium', icon: '🚀' },
+      { label: "Le budget n'est pas une limite", value: 'premium', icon: '🚀' },
     ],
   },
   {
@@ -61,49 +62,171 @@ const QUESTIONS = [
       { label: '1 mois — Résultats rapides', value: 'fast', icon: '⚡' },
       { label: '3 mois — Transformation sérieuse', value: 'medium', icon: '📅' },
       { label: '6 mois — Transformation complète', value: 'long', icon: '🎯' },
-      { label: 'Je prends le temps qu\'il faut', value: 'patient', icon: '🧘' },
+      { label: "Je prends le temps qu'il faut", value: 'patient', icon: '🧘' },
     ],
   },
 ]
 
+// Returns plan objects from subscriptions array by id
+function getPlan(id) {
+  return subscriptions.find((s) => s.id === id) || subscriptions[0]
+}
+
 function getRecommendation(answers) {
-  const { objective, level, sessions, type, budget } = answers
+  const { objective, level, sessions, type, budget, timeline } = answers
 
-  let program = { name: 'Basic', id: 'basic', slug: '/subscriptions/basic', color: '#60a5fa' }
+  // ── Discipline ──────────────────────────────────────────────────────────────
   let discipline = { name: 'Musculation', slug: '/musculation', color: '#F5C518' }
-  let reasons = []
-
-  if (objective === 'endurance' || objective === 'competition') {
-    discipline = { name: objective === 'competition' ? 'HYROX' : 'Hybrid Athlete', slug: objective === 'competition' ? '/hyrox' : '/hybrid-athlete', color: '#4ade80' }
-    reasons.push('Ton objectif orienté endurance/performance correspond parfaitement à ce programme')
-  } else if (objective === 'masse') {
-    discipline = { name: 'Musculation', slug: '/musculation', color: '#F5C518' }
-    reasons.push('La musculation est la discipline la plus efficace pour ta prise de masse')
-  } else if (objective === 'perte') {
-    discipline = { name: 'Hybrid Athlete', slug: '/hybrid-athlete', color: '#f87171' }
-    reasons.push('La méthode hybride maximise la combustion des graisses tout en préservant le muscle')
-  }
-
   if (type === 'running') {
     discipline = { name: 'Running', slug: '/running', color: '#60a5fa' }
-    reasons.push('Ton affinité pour le running oriente vers un programme de course structuré')
+  } else if (objective === 'competition') {
+    discipline = { name: 'HYROX', slug: '/hyrox', color: '#f97316' }
+  } else if (objective === 'endurance' || type === 'mix') {
+    discipline = { name: 'Hybrid Athlete', slug: '/hybrid-athlete', color: '#4ade80' }
+  } else if (objective === 'perte') {
+    discipline = { name: 'Hybrid Athlete', slug: '/hybrid-athlete', color: '#4ade80' }
   }
 
-  if (budget === 'premium' || level === 'competiteur') {
-    program = { name: 'Premium', id: 'premium', slug: '/subscriptions/premium', color: '#F5C518' }
-    reasons.push('Ton niveau ou tes exigences nécessitent un suivi individualisé et intensif')
-  } else if (budget === 'pro' || level === 'avance' || sessions === '4-5' || sessions === '6+') {
-    program = { name: 'Pro', id: 'pro', slug: '/subscriptions/pro', color: '#4ade80' }
-    reasons.push('Ton niveau d\'engagement justifie un programme plus complet')
+  // ── Primary plan based on budget ────────────────────────────────────────────
+  let primaryId = 'starter'
+  if (budget === 'premium') {
+    primaryId = 'quarterly'
+  } else if (budget === 'pro') {
+    primaryId = 'monthly'
   } else {
-    reasons.push('Pour ton niveau actuel et tes disponibilités, le programme Basic est un excellent départ')
+    // budget = basic
+    // If level/sessions suggest more investment, still starter but offer monthly as upgrade
+    primaryId = 'starter'
   }
 
-  return { program, discipline, reasons }
+  // Override: high level or competition always needs at least monthly
+  if ((level === 'competiteur' || level === 'avance') && primaryId === 'starter') {
+    primaryId = 'monthly'
+  }
+  // Long timeline always suggests quarterly
+  if ((timeline === 'long' || timeline === 'medium') && budget === 'premium') {
+    primaryId = 'quarterly'
+  }
+
+  // ── Secondary plan (upgrade suggestion) ─────────────────────────────────────
+  let secondaryId = null
+  if (primaryId === 'starter') {
+    secondaryId = 'monthly' // always offer upgrade
+  } else if (primaryId === 'monthly' && (level === 'competiteur' || objective === 'competition' || timeline === 'long' || timeline === 'medium')) {
+    secondaryId = 'quarterly'
+  }
+
+  // ── Reasons ─────────────────────────────────────────────────────────────────
+  const reasons = []
+
+  if (objective === 'masse') reasons.push('La musculation est la discipline la plus efficace pour ta prise de masse et de force')
+  else if (objective === 'perte') reasons.push('La méthode hybride maximise la combustion des graisses tout en préservant le muscle')
+  else if (objective === 'endurance') reasons.push("L'entraînement hybride combine force et cardio pour booster ton endurance")
+  else if (objective === 'competition') reasons.push('Le programme HYROX est conçu spécifiquement pour la compétition fonctionnelle')
+
+  if (type === 'running') reasons.push('Ton affinité pour le running oriente vers un programme de course structuré')
+
+  if (level === 'debutant') reasons.push('Le programme est adapté aux débutants avec une progression douce et encadrée')
+  else if (level === 'avance' || level === 'competiteur') reasons.push('Ton niveau élevé nécessite un suivi individualisé pour progresser encore')
+
+  if (sessions === '4-5' || sessions === '6+') reasons.push('Avec autant de séances par semaine, un programme structuré est indispensable pour éviter le surentraînement')
+
+  if (timeline === 'medium' || timeline === 'long') reasons.push('Pour une transformation durable, un accompagnement sur plusieurs mois est fortement recommandé')
+
+  const primaryPlan = getPlan(primaryId)
+  const secondaryPlan = secondaryId ? getPlan(secondaryId) : null
+
+  return { primaryPlan, secondaryPlan, discipline, reasons }
+}
+
+// Plan colors
+const PLAN_COLORS = {
+  starter: '#60a5fa',
+  monthly: '#F5C518',
+  quarterly: '#4ade80',
+}
+
+function PlanCard({ plan, isPrimary, discipline }) {
+  const color = PLAN_COLORS[plan.id] || '#F5C518'
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="card p-6 relative overflow-hidden"
+      style={{ border: isPrimary ? `1px solid ${color}50` : undefined }}
+    >
+      {/* Glow */}
+      {isPrimary && (
+        <div
+          className="absolute top-0 right-0 w-48 h-48 rounded-full blur-[80px] opacity-10 pointer-events-none"
+          style={{ background: color }}
+        />
+      )}
+
+      {/* Badge */}
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          {isPrimary && (
+            <span
+              className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full mb-2"
+              style={{ background: color + '20', color }}
+            >
+              <Star size={10} fill="currentColor" /> RECOMMANDÉ POUR TOI
+            </span>
+          )}
+          {!isPrimary && (
+            <span
+              className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full mb-2"
+              style={{ background: 'rgba(255,255,255,0.06)', color: 'var(--text-muted)' }}
+            >
+              OPTION ALTERNATIVE
+            </span>
+          )}
+          <div className="font-anton text-2xl tracking-wider" style={{ color: isPrimary ? color : 'white' }}>
+            {plan.name}
+          </div>
+        </div>
+        <div className="text-right">
+          <div className="font-anton text-3xl" style={{ color: isPrimary ? color : 'white' }}>
+            {plan.price}€
+          </div>
+          <div className="text-xs" style={{ color: 'var(--text-muted)' }}>/ {plan.period}</div>
+        </div>
+      </div>
+
+      <p className="text-sm mb-4 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+        {plan.description}
+      </p>
+
+      {/* Features */}
+      <ul className="space-y-2 mb-5">
+        {plan.features.map((f) => (
+          <li key={f} className="flex items-start gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+            <CheckCircle2 size={13} className="mt-0.5 flex-shrink-0" style={{ color: '#4ade80' }} />
+            {f}
+          </li>
+        ))}
+        {plan.notIncluded && plan.notIncluded.map((f) => (
+          <li key={f} className="flex items-start gap-2 text-sm opacity-40">
+            <X size={13} className="mt-0.5 flex-shrink-0" />
+            {f}
+          </li>
+        ))}
+      </ul>
+
+      <Link
+        to={`/subscriptions`}
+        className={isPrimary ? 'btn-primary w-full flex items-center justify-center gap-2 py-3' : 'btn-outline w-full flex items-center justify-center gap-2 py-3'}
+      >
+        {plan.cta} <ArrowRight size={14} />
+      </Link>
+    </motion.div>
+  )
 }
 
 export default function QuizPage() {
-  const [step, setStep] = useState(0) // 0 = intro
+  const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState({})
   const [selectedOption, setSelectedOption] = useState(null)
   const [result, setResult] = useState(null)
@@ -140,7 +263,7 @@ export default function QuizPage() {
     setResult(null)
   }
 
-  const progress = isDone ? 100 : step === 0 ? 0 : ((step) / QUESTIONS.length) * 100
+  const progress = isDone ? 100 : step === 0 ? 0 : (step / QUESTIONS.length) * 100
 
   return (
     <div className="pt-20 min-h-screen">
@@ -194,10 +317,10 @@ export default function QuizPage() {
               <h2 className="font-semibold text-xl mb-4">Comment ça marche ?</h2>
               <p className="text-sm leading-relaxed mb-8" style={{ color: 'var(--text-secondary)' }}>
                 Réponds à 6 questions rapides sur tes objectifs, ton niveau et tes disponibilités.
-                En moins de 2 minutes, tu recevras une recommandation personnalisée sur le programme et la discipline faits pour toi.
+                En moins de 2 minutes, tu recevras une recommandation personnalisée avec les programmes et tarifs adaptés à ton budget.
               </p>
               <div className="flex flex-col gap-2 text-sm mb-8" style={{ color: 'var(--text-secondary)' }}>
-                {['Objectif & discipline adaptée', 'Programme (Basic, Pro ou Premium)', 'Raisons personnalisées'].map(f => (
+                {['Discipline adaptée à ton objectif', '1 ou 2 programmes avec prix exacts', 'Raisons personnalisées'].map((f) => (
                   <div key={f} className="flex items-center gap-2 justify-center">
                     <CheckCircle2 size={14} style={{ color: '#4ade80' }} />
                     {f}
@@ -224,7 +347,7 @@ export default function QuizPage() {
               <div className="space-y-3 mb-8">
                 {currentQ.options.map((opt) => (
                   <button
-                    key={opt.value}
+                    key={opt.value + opt.label}
                     onClick={() => setSelectedOption(opt.value)}
                     className="w-full flex items-center gap-4 p-4 rounded-xl text-left transition-all"
                     style={{
@@ -268,72 +391,79 @@ export default function QuizPage() {
           {isDone && result && (
             <motion.div
               key="result"
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
               className="space-y-5"
             >
+              {/* Header card */}
               <div className="card p-8 text-center">
                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(74,222,128,0.1)' }}>
                   <CheckCircle2 size={32} style={{ color: '#4ade80' }} />
                 </div>
                 <h2 className="font-anton text-3xl tracking-wider mb-2">TON RÉSULTAT</h2>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Basé sur tes réponses, voici nos recommandations</p>
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  {result.secondaryPlan
+                    ? 'Voici les 2 programmes qui correspondent le mieux à ton profil'
+                    : 'Voici le programme qui correspond le mieux à ton profil'}
+                </p>
               </div>
 
-              {/* Program recommendation */}
-              <div className="card p-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-3 h-3 rounded-full" style={{ background: result.program.color }} />
-                  <h3 className="font-semibold">Programme recommandé</h3>
-                </div>
-                <div
-                  className="text-center rounded-xl p-6 mb-4"
-                  style={{ background: result.program.color + '10', border: `1px solid ${result.program.color}30` }}
-                >
-                  <div className="font-anton text-4xl tracking-wider mb-1" style={{ color: result.program.color }}>
-                    {result.program.name}
-                  </div>
-                  <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Formule recommandée</div>
-                </div>
-                <Link to={result.program.slug} className="btn-primary w-full flex items-center justify-center gap-2 py-3">
-                  Voir ce programme <ArrowRight size={14} />
-                </Link>
-              </div>
+              {/* Primary plan */}
+              <PlanCard plan={result.primaryPlan} isPrimary={true} discipline={result.discipline} />
+
+              {/* Secondary plan (if any) */}
+              {result.secondaryPlan && (
+                <PlanCard plan={result.secondaryPlan} isPrimary={false} discipline={result.discipline} />
+              )}
 
               {/* Discipline */}
-              <div className="card p-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-3 h-3 rounded-full" style={{ background: result.discipline.color }} />
-                  <h3 className="font-semibold">Discipline recommandée</h3>
-                </div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+                className="card p-6"
+              >
+                <h3 className="font-semibold mb-3 text-sm" style={{ color: 'var(--text-muted)' }}>DISCIPLINE RECOMMANDÉE</h3>
                 <div
-                  className="text-center rounded-xl p-6 mb-4"
+                  className="flex items-center justify-between rounded-xl px-5 py-4"
                   style={{ background: result.discipline.color + '10', border: `1px solid ${result.discipline.color}30` }}
                 >
-                  <div className="font-anton text-3xl tracking-wider" style={{ color: result.discipline.color }}>
+                  <span className="font-anton text-2xl tracking-wider" style={{ color: result.discipline.color }}>
                     {result.discipline.name}
-                  </div>
+                  </span>
+                  <Link
+                    to={result.discipline.slug}
+                    className="text-xs font-semibold flex items-center gap-1 px-3 py-1.5 rounded-lg"
+                    style={{ background: result.discipline.color + '20', color: result.discipline.color }}
+                  >
+                    Découvrir <ArrowRight size={12} />
+                  </Link>
                 </div>
-                <Link to={result.discipline.slug} className="btn-outline w-full flex items-center justify-center gap-2 py-3">
-                  Découvrir la discipline <ArrowRight size={14} />
-                </Link>
-              </div>
+              </motion.div>
 
               {/* Reasons */}
-              <div className="card p-8">
-                <h3 className="font-semibold mb-4">Pourquoi ce programme ?</h3>
-                <div className="space-y-3">
-                  {result.reasons.map((r, i) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <CheckCircle2 size={16} className="mt-0.5 flex-shrink-0" style={{ color: '#4ade80' }} />
-                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{r}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              {result.reasons.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.2 }}
+                  className="card p-6"
+                >
+                  <h3 className="font-semibold mb-4 text-sm" style={{ color: 'var(--text-muted)' }}>POURQUOI CES PROGRAMMES ?</h3>
+                  <div className="space-y-3">
+                    {result.reasons.map((r, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <CheckCircle2 size={14} className="mt-0.5 flex-shrink-0" style={{ color: '#4ade80' }} />
+                        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{r}</p>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
 
+              {/* Bottom actions */}
               <div className="flex gap-3">
                 <button onClick={restart} className="btn-outline flex-1 flex items-center justify-center gap-2 py-3">
                   <RotateCcw size={14} />
