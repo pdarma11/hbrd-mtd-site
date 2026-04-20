@@ -303,6 +303,39 @@ export const subscriptions = [
   },
 ]
 
+// ─── DISCIPLINE PRICING ──────────────────────────────────────────────────────
+// Prix personnalisés par discipline (remplacent le prix de base du plan)
+export const disciplinePricing = {
+  musculation: [
+    { id: 'starter',   price: '9,99',   period: 'mois',    desc: 'Accès à la base d\'exercices musculation et suivi de tes entraînements.' },
+    { id: 'monthly',   price: '49,99',  period: 'mois',    desc: 'Programme musculation 100% personnalisé : hypertrophie, force ou définition.' },
+    { id: 'quarterly', price: '119,99', period: '3 mois',  desc: 'Transformation musculaire complète sur 12 semaines avec suivi intensif.' },
+  ],
+  running: [
+    { id: 'starter',   price: '9,99',   period: 'mois',    desc: 'Accès à la base d\'exercices running et suivi de tes séances de course.' },
+    { id: 'monthly',   price: '44,99',  period: 'mois',    desc: 'Plan running personnalisé : 5km, 10km, semi ou marathon selon ton niveau.' },
+    { id: 'quarterly', price: '109,99', period: '3 mois',  desc: 'Préparation complète sur 12 semaines avec analyse de foulée et nutrition.' },
+  ],
+  'hybrid-athlete': [
+    { id: 'starter',   price: '9,99',   period: 'mois',    desc: 'Accès à la bibliothèque d\'exercices hybrides et suivi de progression.' },
+    { id: 'monthly',   price: '59,99',  period: 'mois',    desc: 'Programme hybride force + endurance, conçu pour l\'athlète complet.' },
+    { id: 'quarterly', price: '139,99', period: '3 mois',  desc: 'Développement hybride intensif sur 12 semaines : VO2max, force et cardio.' },
+  ],
+  hyrox: [
+    { id: 'starter',   price: '9,99',   period: 'mois',    desc: 'Accès aux ressources HYROX et suivi de tes performances aux stations.' },
+    { id: 'monthly',   price: '69,99',  period: 'mois',    desc: 'Préparation HYROX mensuelle : 8 stations, 8km course, cardio-résistance.' },
+    { id: 'quarterly', price: '159,99', period: '3 mois',  desc: 'Préparation compétition HYROX complète sur 12 semaines, garantie résultats.' },
+  ],
+}
+
+// Helper : retourne le plan fusionné avec le prix de la discipline
+export function getPlanForDiscipline(planId, disciplineSlug) {
+  const base = subscriptions.find((s) => s.id === planId)
+  if (!base) return null
+  const override = (disciplinePricing[disciplineSlug] || []).find((p) => p.id === planId)
+  return override ? { ...base, price: override.price, period: override.period, description: override.desc } : base
+}
+
 // ─── EXERCISES ───────────────────────────────────────────────────────────────
 
 export const exercises = [

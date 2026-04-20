@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HelpCircle, ArrowRight, ArrowLeft, CheckCircle2, RotateCcw, Star, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { subscriptions } from '../data/mockData'
+import { subscriptions, disciplinePricing } from '../data/mockData'
 
 const QUESTIONS = [
   {
@@ -67,9 +67,11 @@ const QUESTIONS = [
   },
 ]
 
-// Returns plan objects from subscriptions array by id
-function getPlan(id) {
-  return subscriptions.find((s) => s.id === id) || subscriptions[0]
+// Returns plan object merged with discipline-specific pricing
+function getPlan(id, disciplineSlug) {
+  const base = subscriptions.find((s) => s.id === id) || subscriptions[0]
+  const override = (disciplinePricing[disciplineSlug] || []).find((p) => p.id === id)
+  return override ? { ...base, price: override.price, period: override.period, description: override.desc } : base
 }
 
 function getRecommendation(answers) {
@@ -133,8 +135,9 @@ function getRecommendation(answers) {
 
   if (timeline === 'medium' || timeline === 'long') reasons.push('Pour une transformation durable, un accompagnement sur plusieurs mois est fortement recommandé')
 
-  const primaryPlan = getPlan(primaryId)
-  const secondaryPlan = secondaryId ? getPlan(secondaryId) : null
+  const discSlug = discipline.slug.replace('/', '')
+  const primaryPlan = getPlan(primaryId, discSlug)
+  const secondaryPlan = secondaryId ? getPlan(secondaryId, discSlug) : null
 
   return { primaryPlan, secondaryPlan, discipline, reasons }
 }

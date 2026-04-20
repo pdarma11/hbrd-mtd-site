@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { Check, X, Zap, Dumbbell, Wind, Trophy, ChevronRight, ArrowLeft } from 'lucide-react'
-import { subscriptions } from '../data/mockData'
+import { subscriptions, disciplinePricing } from '../data/mockData'
 
 const fadeUp = { initial: { opacity: 0, y: 30 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true }, transition: { duration: 0.6 } }
 
@@ -16,6 +16,12 @@ const DISCIPLINES = [
 export default function Subscriptions() {
   const [selectedDiscipline, setSelectedDiscipline] = useState(null)
   const disc = DISCIPLINES.find(d => d.slug === selectedDiscipline)
+
+  // Fusionne le plan de base avec le tarif spécifique à la discipline
+  const getDiscPlan = (sub) => {
+    const override = (disciplinePricing[selectedDiscipline] || []).find(p => p.id === sub.id)
+    return override ? { ...sub, price: override.price, period: override.period, description: override.desc } : sub
+  }
 
   return (
     <div className="pt-20">
@@ -99,7 +105,9 @@ export default function Subscriptions() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-                  {subscriptions.map((sub, i) => (
+                  {subscriptions.map((rawSub, i) => {
+                    const sub = getDiscPlan(rawSub)
+                    return (
                     <motion.div
                       key={sub.id}
                       className="card flex flex-col relative"
@@ -156,7 +164,7 @@ export default function Subscriptions() {
                         </Link>
                       </div>
                     </motion.div>
-                  ))}
+                  )})}
                 </div>
               </motion.div>
             )}
