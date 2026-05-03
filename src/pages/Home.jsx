@@ -489,11 +489,8 @@ export default function Home() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <span className="section-label mb-6 inline-flex">
-            <Target size={12} />
-            Disciplines
-          </span>
-          <h2 className="font-anton text-5xl md:text-6xl tracking-wider">
+          <span className="overline">Disciplines</span>
+          <h2 className="font-anton text-4xl sm:text-5xl md:text-7xl tracking-wider">
             TA DISCIPLINE,
             <br />
             <span className="gradient-text">TON PROGRAMME</span>
@@ -516,10 +513,10 @@ export default function Home() {
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: 'var(--accent)' }}>
+                    <p className="overline" style={{ marginBottom: '0.4rem' }}>
                       {disc.tagline}
                     </p>
-                    <h3 className="font-anton text-3xl tracking-wide text-white">{disc.name}</h3>
+                    <h3 className="font-anton text-4xl md:text-5xl tracking-wide text-white">{disc.name}</h3>
                   </div>
                   <ChevronRight
                     size={20}
@@ -554,14 +551,11 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ duration: 0.7 }}
             >
-              <span className="section-label mb-6 inline-flex">
-                <Zap size={12} />
-                À propos
-              </span>
-              <h2 className="font-anton text-5xl tracking-wider mb-6">
-                PÉRYK DARMALINGON
+              <span className="overline">À propos</span>
+              <h2 className="font-anton text-5xl md:text-7xl tracking-wider mb-6">
+                PÉRYK
                 <br />
-                <span className="gradient-text">TON COACH</span>
+                <span className="gradient-text">DARMALINGON</span>
               </h2>
               <p className="text-base leading-relaxed mb-6" style={{ color: 'var(--text-secondary)' }}>
                 Coach sportif certifié BPJEPS, spécialiste en méthode hybride depuis 5 ans.
@@ -592,7 +586,7 @@ export default function Home() {
                 { value: '3', suffix: '', label: 'Disciplines maîtrisées', sub: 'Musculation, Running, HYROX' },
               ].map((item) => (
                 <div key={item.label} className="card-elevated p-6 rounded-xl">
-                  <div className="font-anton text-4xl gradient-text mb-1">
+                  <div className="font-anton text-5xl md:text-6xl gradient-text mb-1" style={{ lineHeight: 1 }}>
                     <AnimatedCounter value={item.value} suffix={item.suffix} duration={1800} />
                   </div>
                   <div className="text-sm font-semibold text-white mb-1">{item.label}</div>
@@ -617,14 +611,11 @@ export default function Home() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <span className="section-label mb-6 inline-flex">
-              <Star size={12} />
-              Témoignages
-            </span>
-            <h2 className="font-anton text-5xl md:text-6xl tracking-wider">
+            <span className="overline">Témoignages</span>
+            <h2 className="font-anton text-5xl md:text-8xl tracking-wider">
               ILS ONT
               <br />
-              <span className="gradient-text">TRANSFORMÉ LEUR CORPS</span>
+              <span className="gradient-text">TRANSFORMÉ</span>
             </h2>
           </motion.div>
 
@@ -692,11 +683,8 @@ export default function Home() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <span className="section-label mb-6 inline-flex">
-              <TrendingUp size={12} />
-              Abonnements
-            </span>
-            <h2 className="font-anton text-5xl md:text-6xl tracking-wider">
+            <span className="overline">Abonnements</span>
+            <h2 className="font-anton text-5xl md:text-8xl tracking-wider">
               CHOISIS
               <br />
               <span className="gradient-text">TON NIVEAU</span>
@@ -735,7 +723,7 @@ export default function Home() {
                   </div>
                 )}
                 <div>
-                  <h3 className="font-anton text-xl tracking-wider mb-2">{sub.name}</h3>
+                  <h3 className="font-anton text-2xl tracking-wider mb-2">{sub.name}</h3>
                   <div className="flex items-baseline gap-1">
                     <span className="font-anton text-4xl gradient-text">{sub.price}€</span>
                     <span className="text-sm" style={{ color: 'var(--text-muted)' }}>/ {sub.period}</span>

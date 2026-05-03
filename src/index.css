@@ -166,6 +166,52 @@ body {
   background: var(--border);
 }
 
+/* ── Typography scale ─────────────────────────────────────────────────────── */
+
+/* Tighten Anton globally for more punch */
+.font-anton {
+  line-height: 0.92;
+}
+
+/* Giant display heading — landmark sections */
+.text-display {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(3.2rem, 8vw, 8rem);
+  line-height: 0.92;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* Hero-scale heading */
+.text-hero {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(4rem, 11vw, 10rem);
+  line-height: 0.9;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* Tiny overline — sits above a big heading */
+.overline {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+/* Large section number — decorative */
+.section-num {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(5rem, 12vw, 11rem);
+  line-height: 1;
+  color: var(--border);
+  letter-spacing: -0.02em;
+  user-select: none;
+}
+
 /* Tag */
 .tag {
   display: inline-flex;

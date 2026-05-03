@@ -461,7 +461,8 @@ export default function DisciplinePage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="font-anton text-4xl tracking-wider mb-6">LA MÉTHODE</h2>
+            <span className="overline">La méthode</span>
+          <h2 className="font-anton text-5xl md:text-6xl tracking-wider mb-6">COMMENT<br /><span style={{ color: acc }}>ÇA MARCHE</span></h2>
             <p className="text-base leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>{details.description}</p>
             <p className="text-base leading-relaxed mb-8" style={{ color: 'var(--text-secondary)' }}>{details.description2}</p>
             <div className="flex flex-wrap gap-3">
@@ -504,8 +505,9 @@ export default function DisciplinePage() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="font-anton text-4xl tracking-wider mb-3">POUR QUI ?</h2>
-            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Cette discipline est-elle faite pour toi ?</p>
+            <span className="overline">Profil idéal</span>
+            <h2 className="font-anton text-5xl md:text-7xl tracking-wider mb-3">POUR QUI ?</h2>
+            <p className="text-sm mt-3" style={{ color: 'var(--text-muted)' }}>Cette discipline est-elle faite pour toi ?</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -568,7 +570,8 @@ export default function DisciplinePage() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="font-anton text-4xl tracking-wider mb-3">SEMAINE TYPE</h2>
+          <span className="overline">Planning</span>
+          <h2 className="font-anton text-5xl md:text-7xl tracking-wider mb-3">SEMAINE TYPE</h2>
           <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Un aperçu de ta semaine d'entraînement</p>
         </motion.div>
 
