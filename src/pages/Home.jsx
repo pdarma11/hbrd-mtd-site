@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
-import { motion, useScroll, useTransform } from 'framer-motion'
-import { useRef, useState } from 'react'
+import { motion, useScroll, useTransform, useAnimation } from 'framer-motion'
+import { useRef, useState, useEffect } from 'react'
 import { ArrowRight, Zap, Target, TrendingUp, Star, ChevronRight, Play, Calculator, HelpCircle } from 'lucide-react'
 import { subscriptions, clients, disciplines } from '../data/mockData'
 import ParticleField from '../components/ParticleField'
@@ -312,40 +312,93 @@ export default function Home() {
         {/* Particles */}
         <ParticleField count={55} />
 
-        {/* Gradient orbs */}
-        <div
+        {/* ── Orb 1 — gold, drifts slowly ── */}
+        <motion.div
           className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-10 blur-[120px] pointer-events-none"
           style={{ background: 'var(--accent)' }}
+          animate={{ x: [0, 60, -40, 0], y: [0, -60, 40, 0], scale: [1, 1.15, 0.9, 1] }}
+          transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut' }}
         />
-        <div
-          className="absolute bottom-0 left-1/4 w-[400px] h-[400px] rounded-full opacity-5 blur-[100px] pointer-events-none"
+        {/* ── Orb 2 — indigo, counter-drift ── */}
+        <motion.div
+          className="absolute bottom-0 left-1/4 w-[400px] h-[400px] rounded-full opacity-6 blur-[100px] pointer-events-none"
           style={{ background: '#4f46e5' }}
+          animate={{ x: [0, -50, 30, 0], y: [0, 40, -30, 0], scale: [1, 0.9, 1.1, 1] }}
+          transition={{ duration: 13, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
         />
+        {/* ── Orb 3 — green accent, appears subtly ── */}
+        <motion.div
+          className="absolute top-1/2 right-0 w-[300px] h-[300px] rounded-full blur-[110px] pointer-events-none"
+          style={{ background: '#4ade80', opacity: 0 }}
+          animate={{ opacity: [0, 0.04, 0.02, 0.05, 0], x: [0, -30, 20, 0] }}
+          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut', delay: 4 }}
+        />
+
+        {/* ── Floating keyword chips ── */}
+        {[
+          { text: 'FORCE',        top: '18%', left: '6%',  delay: 1.2, drift: [0, -10, 6, 0] },
+          { text: 'VO2MAX',       top: '28%', left: '82%', delay: 1.5, drift: [0, 8, -5, 0] },
+          { text: 'HYROX',        top: '62%', left: '4%',  delay: 1.8, drift: [0, 6, -8, 0] },
+          { text: 'PERFORMANCE',  top: '72%', left: '78%', delay: 2.0, drift: [0, -8, 4, 0] },
+          { text: 'ENDURANCE',    top: '12%', left: '55%', delay: 2.3, drift: [0, 10, -6, 0] },
+          { text: 'HYBRID',       top: '80%', left: '42%', delay: 2.6, drift: [0, -6, 10, 0] },
+        ].map((chip) => (
+          <motion.span
+            key={chip.text}
+            className="absolute font-anton tracking-widest pointer-events-none select-none hidden md:block"
+            style={{ top: chip.top, left: chip.left, fontSize: 'clamp(0.55rem, 1vw, 0.75rem)', color: 'rgba(245,197,24,0.12)', letterSpacing: '0.2em' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 1, 0.7, 1], y: chip.drift }}
+            transition={{ opacity: { duration: 0.8, delay: chip.delay }, y: { duration: 8, repeat: Infinity, ease: 'easeInOut', delay: chip.delay } }}
+          >
+            {chip.text}
+          </motion.span>
+        ))}
 
         <motion.div
           style={{ y: heroY, opacity: heroOpacity }}
           className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center pt-24"
         >
+          {/* Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <span className="section-label mb-8 inline-flex">
+            <motion.span
+              className="section-label mb-8 inline-flex"
+              animate={{ boxShadow: ['0 0 0px rgba(245,197,24,0)', '0 0 12px rgba(245,197,24,0.25)', '0 0 0px rgba(245,197,24,0)'] }}
+              transition={{ duration: 3, repeat: Infinity, delay: 1 }}
+            >
               <Zap size={12} />
               Hybrid Method — HBRD MTD
-            </span>
+            </motion.span>
           </motion.div>
 
-          <h1 className="font-anton text-6xl sm:text-7xl md:text-8xl lg:text-9xl tracking-wider leading-none mb-6">
-            <RevealText text="PLUS FORT." className="block" delay={0.15} />
-            <RevealText
-              text="PLUS VITE."
-              className="block gradient-text"
-              delay={0.35}
-            />
-            <RevealText text="PLUS LOIN." className="block" delay={0.55} />
-          </h1>
+          {/* Title with sweep line */}
+          <div className="relative inline-block w-full">
+            <h1 className="font-anton text-6xl sm:text-7xl md:text-8xl lg:text-9xl tracking-wider leading-none mb-6">
+              <RevealText text="PLUS FORT." className="block" delay={0.15} />
+              <RevealText text="PLUS VITE." className="block gradient-text" delay={0.35} />
+              <RevealText text="PLUS LOIN." className="block" delay={0.55} />
+            </h1>
+            {/* Golden sweep line that crosses the title once on load */}
+            <motion.div
+              className="absolute inset-0 pointer-events-none"
+              style={{ overflow: 'hidden' }}
+            >
+              <motion.div
+                style={{
+                  position: 'absolute', top: 0, left: '-10%', width: '15%', height: '100%',
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(245,197,24,0.18) 50%, transparent 100%)',
+                  transform: 'skewX(-12deg)',
+                }}
+                initial={{ x: '-20%', opacity: 0 }}
+                animate={{ x: ['−20%', '130%'], opacity: [0, 1, 1, 0] }}
+                transition={{ duration: 1.1, delay: 1.1, ease: 'easeInOut' }}
+              />
+            </motion.div>
+          </div>
 
           <motion.p
             className="text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed"
@@ -358,65 +411,72 @@ export default function Home() {
             Transforme ton corps avec une méthode scientifique et un suivi personnalisé.
           </motion.p>
 
+          {/* CTAs — primary has pulse ring */}
           <motion.div
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.95 }}
           >
-            <Link to="/subscriptions" className="btn-primary flex items-center gap-2 text-base px-8 py-4">
-              Commencer maintenant
-              <ArrowRight size={16} />
-            </Link>
+            <div className="relative">
+              {/* Pulse ring */}
+              <motion.div
+                className="absolute inset-0 rounded-lg pointer-events-none"
+                style={{ border: '2px solid rgba(245,197,24,0.5)' }}
+                animate={{ scale: [1, 1.12, 1], opacity: [0.5, 0, 0.5] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+              />
+              <Link to="/subscriptions" className="btn-primary flex items-center gap-2 text-base px-8 py-4 relative">
+                Commencer maintenant
+                <ArrowRight size={16} />
+              </Link>
+            </div>
             <Link to="/results" className="btn-outline flex items-center gap-2 text-base px-8 py-4">
               <Play size={16} />
               Voir les résultats
             </Link>
           </motion.div>
 
-          {/* Animated Stats */}
-          <motion.div
-            className="grid grid-cols-3 gap-4 mt-20 max-w-lg mx-auto"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 1.1 }}
-          >
+          {/* Stats — staggered individual reveal */}
+          <div className="grid grid-cols-3 gap-4 mt-20 max-w-lg mx-auto">
             {[
               { value: '250', prefix: '+', suffix: '', label: 'Clients coachés' },
               { value: '98', prefix: '', suffix: '%', label: 'Satisfaction' },
               { value: '5', prefix: '', suffix: ' ans', label: 'Expérience' },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center">
+            ].map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                className="text-center"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 1.15 + i * 0.15 }}
+              >
                 <div className="font-anton text-3xl md:text-4xl gradient-text">
-                  <AnimatedCounter
-                    value={stat.value}
-                    prefix={stat.prefix}
-                    suffix={stat.suffix}
-                    duration={2000}
-                  />
+                  <AnimatedCounter value={stat.value} prefix={stat.prefix} suffix={stat.suffix} duration={2000} />
                 </div>
                 <div className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>{stat.label}</div>
-              </div>
+              </motion.div>
             ))}
-          </motion.div>
+          </div>
         </motion.div>
 
         {/* Scroll indicator */}
         <motion.div
           className="absolute bottom-8 left-1/2 -translate-x-1/2"
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
           initial={{ opacity: 0 }}
-          style={{ opacity: 1 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 2, duration: 0.6 }}
         >
-          <div className="w-6 h-10 rounded-full border-2 flex items-start justify-center pt-2" style={{ borderColor: 'var(--border)' }}>
-            <motion.div
-              className="w-1 h-2 rounded-full"
-              style={{ background: 'var(--accent)' }}
-              animate={{ y: [0, 6, 0], opacity: [1, 0, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-          </div>
+          <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 2, repeat: Infinity }}>
+            <div className="w-6 h-10 rounded-full border-2 flex items-start justify-center pt-2" style={{ borderColor: 'var(--border)' }}>
+              <motion.div
+                className="w-1 h-2 rounded-full"
+                style={{ background: 'var(--accent)' }}
+                animate={{ y: [0, 6, 0], opacity: [1, 0, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+            </div>
+          </motion.div>
         </motion.div>
       </section>
 
