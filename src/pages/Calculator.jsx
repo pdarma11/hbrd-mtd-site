@@ -19,10 +19,40 @@ const GOALS = [
 ]
 
 function getBMICategory(bmi) {
-  if (bmi < 18.5) return { label: 'Insuffisance pondérale', color: '#60a5fa' }
-  if (bmi < 25) return { label: 'Poids normal', color: '#4ade80' }
-  if (bmi < 30) return { label: 'Surpoids', color: '#fbbf24' }
-  return { label: 'Obésité', color: '#f87171' }
+  if (bmi < 18.5) return {
+    label: 'Insuffisance pondérale', color: '#60a5fa',
+    tip: 'Ton poids est en dessous de la normale. Consulte un professionnel de santé et envisage un programme de prise de masse douce, riche en protéines et calories de qualité.'
+  }
+  if (bmi < 25) return {
+    label: 'Poids normal', color: '#4ade80',
+    tip: 'Excellent — tu es dans la zone idéale. Focus sur la composition corporelle (muscle vs. graisse) plutôt que sur le poids total.'
+  }
+  if (bmi < 30) return {
+    label: 'Surpoids', color: '#fbbf24',
+    tip: 'Un déficit de 300–500 kcal/jour combiné à 3–4 séances de sport par semaine est la formule la plus efficace et durable.'
+  }
+  return {
+    label: 'Obésité', color: '#f87171',
+    tip: 'Commence par un déficit modéré (300 kcal max) et augmente progressivement l\'activité. Un suivi médical est recommandé avant de démarrer.'
+  }
+}
+
+const GOAL_TIPS = {
+  perte: [
+    { icon: '🥩', tip: 'Maintiens un apport en protéines élevé (2g/kg) pour préserver le muscle pendant la perte de poids.' },
+    { icon: '⏰', tip: 'Répartis tes repas en 3–4 prises pour éviter les fringales et stabiliser la glycémie.' },
+    { icon: '💧', tip: 'Bois 2–3L d\'eau par jour — la déshydratation est souvent confondue avec la faim.' },
+  ],
+  maintien: [
+    { icon: '📊', tip: 'Le maintien est idéal pour faire de la recomposition corporelle : perdre du gras et prendre du muscle simultanément.' },
+    { icon: '🔄', tip: 'Varie tes sources de protéines et glucides pour optimiser les micronutriments sans te restreindre.' },
+    { icon: '🏋️', tip: 'Concentre-toi sur la progression en force — c\'est le meilleur indicateur de recomposition au maintien.' },
+  ],
+  prise: [
+    { icon: '📈', tip: 'Un surplus de 200–300 kcal/jour est optimal pour prendre de la masse sans accumuler trop de graisse.' },
+    { icon: '🍚', tip: 'Augmente d\'abord les glucides autour de tes séances (avant et après) pour maximiser l\'énergie et la récupération.' },
+    { icon: '😴', tip: 'Le muscle se construit pendant le sommeil. Vise 7–9h par nuit pour optimiser la synthèse protéique.' },
+  ],
 }
 
 // Deadline section — calcule le poids cible à la date butoir
@@ -498,18 +528,23 @@ export default function CalculatorPage() {
                         </span>
                       </div>
                       <div className="font-anton text-5xl gradient-text mb-1">{result.bmi}</div>
-                      <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                        Poids idéal estimé : <strong style={{ color: 'white' }}>{result.idealWeight} kg</strong>
+                      <div className="text-xs mb-4" style={{ color: 'var(--text-muted)' }}>
+                        Poids idéal estimé (formule Devine) : <strong style={{ color: 'white' }}>{result.idealWeight} kg</strong>
                       </div>
-                      <div className="mt-4 relative">
+                      <div className="mt-2 relative mb-4">
                         <div className="h-2 rounded-full" style={{ background: 'linear-gradient(90deg, #60a5fa 0%, #4ade80 30%, #fbbf24 60%, #f87171 100%)' }} />
                         <div
                           className="absolute top-0 w-3 h-2 rounded-full bg-white shadow-lg -translate-x-1/2"
                           style={{ left: `${Math.min(95, Math.max(5, ((parseFloat(result.bmi) - 15) / 25) * 100))}%` }}
                         />
-                        <div className="flex justify-between text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-                          <span>18.5</span><span>25</span><span>30</span><span>35+</span>
+                        <div className="flex justify-between text-xs mt-1.5" style={{ color: 'var(--text-muted)' }}>
+                          <span>Maigreur &lt;18.5</span><span>Normal 25</span><span>Surpoids 30</span><span>Obésité 35+</span>
                         </div>
+                      </div>
+                      {/* Conseil contextuel */}
+                      <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg mt-2" style={{ background: bmiCategory.color + '10', border: `1px solid ${bmiCategory.color}25` }}>
+                        <span className="text-sm mt-0.5">💡</span>
+                        <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{bmiCategory.tip}</p>
                       </div>
                     </div>
 
@@ -526,6 +561,17 @@ export default function CalculatorPage() {
                           <div className="text-xs uppercase tracking-widest mb-1" style={{ color: 'var(--accent)' }}>Objectif {form.goal}</div>
                           <div className="font-anton text-2xl gradient-text">{result.targetCalories}</div>
                           <div className="text-xs" style={{ color: 'var(--text-muted)' }}>kcal / jour</div>
+                        </div>
+                      </div>
+                      {/* Explication BMR vs TDEE */}
+                      <div className="space-y-2">
+                        <div className="flex items-start gap-2 text-xs px-3 py-2 rounded-lg" style={{ background: 'var(--bg-elevated)' }}>
+                          <span className="mt-0.5">🔥</span>
+                          <span style={{ color: 'var(--text-muted)' }}><strong style={{ color: 'white' }}>Métabolisme de base (BMR)</strong> — calories brûlées au repos, même sans bouger. C'est le minimum vital.</span>
+                        </div>
+                        <div className="flex items-start gap-2 text-xs px-3 py-2 rounded-lg" style={{ background: 'var(--bg-elevated)' }}>
+                          <span className="mt-0.5">⚡</span>
+                          <span style={{ color: 'var(--text-muted)' }}><strong style={{ color: 'white' }}>Ton objectif ({result.targetCalories} kcal)</strong> — ton TDEE ajusté pour {form.goal === 'perte' ? 'créer un déficit et perdre du poids' : form.goal === 'prise' ? 'créer un surplus et prendre de la masse' : 'maintenir ton poids actuel'}.</span>
                         </div>
                       </div>
                     </div>
@@ -545,23 +591,80 @@ export default function CalculatorPage() {
                           </div>
                         ))}
                       </div>
-                      {/* Explications brèves */}
+                      {/* Explications + exemples alimentaires */}
                       <div className="space-y-2">
                         {[
-                          { color: '#f87171', icon: '💪', title: 'Protéines', desc: 'Construisent et réparent les muscles. Essentielles pour la récupération et le maintien de la masse musculaire.' },
-                          { color: '#fbbf24', icon: '⚡', title: 'Glucides', desc: 'Carburant principal de l\'effort. Ils alimentent tes séances et rechargent tes réserves d\'énergie (glycogène).' },
-                          { color: '#60a5fa', icon: '🛡️', title: 'Lipides', desc: 'Régulent les hormones et protègent les articulations. Indispensables au bon fonctionnement de l\'organisme.' },
+                          {
+                            color: '#f87171', icon: '💪', title: 'Protéines', value: result.proteins,
+                            desc: 'Construisent et réparent les muscles. Essentielles pour la récupération.',
+                            examples: [
+                              { food: '100g poulet', amount: '31g' },
+                              { food: '100g thon', amount: '29g' },
+                              { food: '2 œufs', amount: '13g' },
+                              { food: '100g fromage blanc 0%', amount: '10g' },
+                            ],
+                          },
+                          {
+                            color: '#fbbf24', icon: '⚡', title: 'Glucides', value: result.carbs,
+                            desc: 'Carburant principal de l\'effort. Rechargent le glycogène musculaire.',
+                            examples: [
+                              { food: '100g riz cuit', amount: '28g' },
+                              { food: '100g pâtes cuites', amount: '25g' },
+                              { food: '1 banane', amount: '27g' },
+                              { food: '100g flocons d\'avoine', amount: '62g' },
+                            ],
+                          },
+                          {
+                            color: '#60a5fa', icon: '🛡️', title: 'Lipides', value: result.fats,
+                            desc: 'Régulent les hormones. Indispensables au bon fonctionnement de l\'organisme.',
+                            examples: [
+                              { food: '1 cs huile d\'olive', amount: '14g' },
+                              { food: '30g amandes', amount: '15g' },
+                              { food: '½ avocat', amount: '15g' },
+                              { food: '100g saumon', amount: '13g' },
+                            ],
+                          },
                         ].map(m => (
-                          <div key={m.title} className="flex items-start gap-3 px-3 py-2.5 rounded-lg" style={{ background: 'var(--bg-elevated)' }}>
-                            <span className="text-base mt-0.5">{m.icon}</span>
-                            <div>
-                              <span className="text-xs font-bold" style={{ color: m.color }}>{m.title} — </span>
-                              <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{m.desc}</span>
+                          <div key={m.title} className="rounded-lg overflow-hidden" style={{ background: 'var(--bg-elevated)' }}>
+                            <div className="flex items-start gap-3 px-3 py-2.5">
+                              <span className="text-base mt-0.5">{m.icon}</span>
+                              <div className="flex-1">
+                                <span className="text-xs font-bold" style={{ color: m.color }}>{m.title} ({m.value}g) — </span>
+                                <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{m.desc}</span>
+                              </div>
+                            </div>
+                            {/* Exemples alimentaires */}
+                            <div className="px-3 pb-2.5 flex flex-wrap gap-1.5">
+                              {m.examples.map(ex => (
+                                <span key={ex.food} className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: m.color + '12', color: m.color, border: `1px solid ${m.color}20` }}>
+                                  {ex.food} = <strong>{ex.amount}</strong>
+                                </span>
+                              ))}
                             </div>
                           </div>
                         ))}
                       </div>
                     </div>
+
+                    {/* Conseils personnalisés selon l'objectif */}
+                    {GOAL_TIPS[form.goal] && (
+                      <div className="card p-6">
+                        <h3 className="font-semibold mb-3 text-sm">
+                          💡 Conseils pour{' '}
+                          <span style={{ color: GOALS.find(g => g.key === form.goal)?.color }}>
+                            {form.goal === 'perte' ? 'la perte de poids' : form.goal === 'prise' ? 'la prise de masse' : 'le maintien'}
+                          </span>
+                        </h3>
+                        <div className="space-y-2">
+                          {GOAL_TIPS[form.goal].map((t, i) => (
+                            <div key={i} className="flex items-start gap-3 px-3 py-2.5 rounded-lg" style={{ background: 'var(--bg-elevated)' }}>
+                              <span className="text-sm mt-0.5">{t.icon}</span>
+                              <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{t.tip}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
                     <div className="flex gap-3">
                       <button onClick={reset} className="btn-outline flex-1 flex items-center justify-center gap-2 py-3">
