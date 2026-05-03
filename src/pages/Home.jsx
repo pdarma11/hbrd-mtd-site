@@ -377,7 +377,7 @@ export default function Home() {
 
           {/* Title with sweep line */}
           <div className="relative inline-block w-full">
-            <h1 className="font-anton text-6xl sm:text-7xl md:text-8xl lg:text-9xl tracking-wider leading-none mb-6">
+            <h1 className="font-anton text-7xl sm:text-8xl md:text-[10rem] lg:text-[12rem] tracking-wider leading-none mb-6">
               <RevealText text="PLUS FORT." className="block" delay={0.15} />
               <RevealText text="PLUS VITE." className="block gradient-text" delay={0.35} />
               <RevealText text="PLUS LOIN." className="block" delay={0.55} />
