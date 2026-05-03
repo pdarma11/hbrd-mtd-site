@@ -153,11 +153,139 @@ const disciplineDetails = {
   },
 }
 
-const disciplineBgWords = {
-  musculation:      ['FORCE', 'MASSE', 'HYPERTROPHIE', 'SQUAT', 'DEADLIFT', 'BENCH', 'PUSH', 'PULL', 'LEGS'],
-  running:          ['ENDURANCE', 'VMA', 'TEMPO', 'FOULÉE', 'SPRINT', 'CARDIO', 'TRAIL', 'MARATHON', 'VO2MAX'],
-  'hybrid-athlete': ['HYBRID', 'FORCE', 'CARDIO', 'VO2MAX', 'PUISSANCE', 'VITESSE', 'ATHLÉTE', 'PERFORMANCE'],
-  hyrox:            ['HYROX', 'SKIERG', 'SLED', 'ROWING', 'BURPEE', '8KM', 'STATION', 'WALL BALL', 'LUNGES'],
+const heroConfig = {
+  musculation: {
+    punchline: 'Soulève plus. Construis plus. Deviens plus.',
+    layout: 'centered',
+  },
+  running: {
+    punchline: 'Chaque foulée te rapproche de ta meilleure version.',
+    layout: 'split',
+  },
+  'hybrid-athlete': {
+    punchline: 'La force des uns. L\'endurance des autres. Les deux.',
+    layout: 'dual',
+  },
+  hyrox: {
+    punchline: '8 km · 8 stations · 0 excuses.',
+    layout: 'competition',
+  },
+}
+
+// Decorative background component — unique per discipline
+function HeroDecoration({ slug, acc }) {
+  if (slug === 'musculation') {
+    return (
+      <>
+        {/* Weight plates — large faded circles */}
+        {[
+          { size: 280, top: '-60px', left: '-80px', opacity: 0.04, delay: 0 },
+          { size: 200, bottom: '-40px', right: '5%', opacity: 0.05, delay: 0.3 },
+          { size: 140, top: '30%', right: '18%', opacity: 0.035, delay: 0.6 },
+        ].map((p, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full border-[12px] pointer-events-none"
+            style={{ width: p.size, height: p.size, top: p.top, bottom: p.bottom, left: p.left, right: p.right, borderColor: acc, opacity: p.opacity }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: p.opacity, scale: 1 }}
+            transition={{ duration: 1.2, delay: p.delay }}
+          >
+            {/* Inner ring */}
+            <div className="absolute inset-[28%] rounded-full border-[6px]" style={{ borderColor: acc }} />
+          </motion.div>
+        ))}
+        {/* Orbs */}
+        <motion.div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full blur-[140px] pointer-events-none" style={{ background: acc, opacity: 0.07 }} animate={{ scale: [1, 1.08, 1] }} transition={{ duration: 8, repeat: Infinity }} />
+        <motion.div className="absolute bottom-0 right-0 w-[300px] h-[300px] rounded-full blur-[100px] pointer-events-none" style={{ background: '#c084fc', opacity: 0.05 }} animate={{ x: [0, -20, 0], y: [0, -20, 0] }} transition={{ duration: 10, repeat: Infinity }} />
+      </>
+    )
+  }
+
+  if (slug === 'running') {
+    return (
+      <>
+        {/* Speed lines */}
+        {[0.12, 0.28, 0.45, 0.62, 0.78].map((top, i) => (
+          <motion.div
+            key={i}
+            className="absolute h-px pointer-events-none"
+            style={{ top: `${top * 100}%`, left: 0, right: 0, background: `linear-gradient(90deg, transparent 0%, ${acc} 40%, transparent 100%)`, opacity: 0.07 + i * 0.015 }}
+            initial={{ scaleX: 0, originX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 1.2, delay: 0.3 + i * 0.15, ease: 'easeOut' }}
+          />
+        ))}
+        {/* Race distances — right side */}
+        <div className="absolute right-4 md:right-12 top-1/2 -translate-y-1/2 flex flex-col items-end gap-1 pointer-events-none select-none hidden lg:flex">
+          {['MARATHON', 'SEMI', '10 KM', '5 KM'].map((d, i) => (
+            <motion.span
+              key={d}
+              className="font-anton tracking-widest"
+              style={{ fontSize: `clamp(1rem, ${2.5 - i * 0.35}vw, 3.2rem)`, color: acc, opacity: 0.06 + i * 0.03, lineHeight: 1.1 }}
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 0.06 + i * 0.03, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 + i * 0.12 }}
+            >
+              {d}
+            </motion.span>
+          ))}
+        </div>
+        {/* Orb — elongated horizontal streak */}
+        <motion.div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[800px] h-[200px] rounded-full blur-[100px] pointer-events-none" style={{ background: acc, opacity: 0.06 }} animate={{ x: [0, 40, 0] }} transition={{ duration: 10, repeat: Infinity }} />
+      </>
+    )
+  }
+
+  if (slug === 'hybrid-athlete') {
+    return (
+      <>
+        {/* Split background panels */}
+        <div className="absolute inset-0 pointer-events-none flex">
+          <motion.div className="flex-1" style={{ background: `linear-gradient(135deg, #F5C51808 0%, transparent 60%)` }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} />
+          <motion.div className="flex-1" style={{ background: `linear-gradient(225deg, ${acc}08 0%, transparent 60%)` }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 0.3 }} />
+        </div>
+        {/* FORCE label left */}
+        <motion.span className="absolute left-4 md:left-10 top-1/2 -translate-y-1/2 font-anton tracking-widest pointer-events-none select-none hidden lg:block" style={{ fontSize: 'clamp(3rem, 6vw, 7rem)', color: '#F5C518', opacity: 0.06, writingMode: 'vertical-lr', transform: 'translateY(-50%) rotate(180deg)' }} initial={{ opacity: 0 }} animate={{ opacity: 0.06 }} transition={{ duration: 1 }}>FORCE</motion.span>
+        {/* ENDURANCE label right */}
+        <motion.span className="absolute right-4 md:right-10 top-1/2 -translate-y-1/2 font-anton tracking-widest pointer-events-none select-none hidden lg:block" style={{ fontSize: 'clamp(2rem, 4vw, 5rem)', color: acc, opacity: 0.07, writingMode: 'vertical-lr' }} initial={{ opacity: 0 }} animate={{ opacity: 0.07 }} transition={{ duration: 1, delay: 0.3 }}>ENDURANCE</motion.span>
+        {/* Dual orbs */}
+        <motion.div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[400px] h-[400px] rounded-full blur-[120px] pointer-events-none" style={{ background: '#F5C518', opacity: 0.07 }} animate={{ scale: [1, 1.1, 1], x: [0, 20, 0] }} transition={{ duration: 9, repeat: Infinity }} />
+        <motion.div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[400px] h-[400px] rounded-full blur-[120px] pointer-events-none" style={{ background: acc, opacity: 0.07 }} animate={{ scale: [1.1, 1, 1.1], x: [0, -20, 0] }} transition={{ duration: 9, repeat: Infinity }} />
+      </>
+    )
+  }
+
+  if (slug === 'hyrox') {
+    const stations = ['SKIERG', 'SLED PUSH', 'SLED PULL', 'BURPEE', 'ROWING', 'FARMER CARRY', 'SANDBAG', 'WALL BALLS']
+    return (
+      <>
+        {/* Dramatic red glow */}
+        <motion.div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full blur-[120px] pointer-events-none" style={{ background: acc, opacity: 0.1 }} animate={{ opacity: [0.1, 0.15, 0.1] }} transition={{ duration: 4, repeat: Infinity }} />
+        {/* "8" floating large */}
+        <motion.span className="absolute font-anton pointer-events-none select-none" style={{ fontSize: 'clamp(8rem, 22vw, 22rem)', color: acc, opacity: 0.04, top: '50%', left: '5%', transform: 'translateY(-50%)', letterSpacing: '-0.05em' }} initial={{ opacity: 0 }} animate={{ opacity: 0.04 }} transition={{ duration: 1 }}>8</motion.span>
+        <motion.span className="absolute font-anton pointer-events-none select-none" style={{ fontSize: 'clamp(8rem, 22vw, 22rem)', color: acc, opacity: 0.04, top: '50%', right: '5%', transform: 'translateY(-50%)', letterSpacing: '-0.05em' }} initial={{ opacity: 0 }} animate={{ opacity: 0.04 }} transition={{ duration: 1, delay: 0.3 }}>8</motion.span>
+        {/* Station grid — bottom of hero, subtle */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 hidden lg:flex gap-2 pointer-events-none">
+          {stations.map((s, i) => (
+            <motion.div
+              key={s}
+              className="text-center px-2 py-1 rounded"
+              style={{ background: `${acc}10`, border: `1px solid ${acc}20` }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.6 + i * 0.07 }}
+            >
+              <div className="font-anton text-[10px] tracking-widest" style={{ color: acc, opacity: 0.7 }}>{i + 1}</div>
+              <div className="text-[8px] tracking-wide whitespace-nowrap" style={{ color: 'var(--text-muted)' }}>{s}</div>
+            </motion.div>
+          ))}
+        </div>
+      </>
+    )
+  }
+
+  return null
 }
 
 const intensityColor = {
@@ -179,47 +307,122 @@ export default function DisciplinePage() {
 
   const acc = details.accent
 
+  const hConf = heroConfig[slug] || heroConfig.musculation
+  const isRunning = slug === 'running'
+
   return (
     <div className="pt-20">
 
       {/* ── Hero ── */}
-      <section className="py-24 px-4 sm:px-6 grid-bg relative overflow-hidden">
-        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] rounded-full opacity-8 blur-[150px]" style={{ background: acc }} />
+      <section className="min-h-[70vh] flex items-center py-24 px-4 sm:px-6 grid-bg relative overflow-hidden">
+        {/* Discipline-specific decoration */}
+        <HeroDecoration slug={slug} acc={acc} />
 
-        {/* Watermark background words */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none select-none" aria-hidden="true">
-          {(disciplineBgWords[slug] || []).map((word, i) => (
+        <div className={`max-w-7xl mx-auto relative z-10 w-full ${isRunning ? 'lg:pr-64' : ''}`}>
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.33, 1, 0.68, 1] }}
+            className={isRunning ? '' : 'max-w-4xl'}
+          >
+            {/* Badge */}
             <motion.span
-              key={word}
-              className="absolute font-anton text-white whitespace-nowrap"
-              style={{
-                fontSize: `clamp(3rem, ${6 + (i % 3)}vw, 8rem)`,
-                opacity: 0.04,
-                top: `${8 + (i * 11) % 80}%`,
-                left: `${(i * 23 + 5) % 90}%`,
-                transform: `rotate(${i % 2 === 0 ? -8 : 6}deg) translateX(-20%)`,
-                letterSpacing: '0.05em',
-              }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.045 }}
-              transition={{ duration: 1.2, delay: i * 0.08 }}
+              className="section-label mb-6 inline-flex"
+              style={{ background: `${acc}15`, borderColor: `${acc}30`, color: acc }}
+              animate={{ boxShadow: [`0 0 0px ${acc}00`, `0 0 16px ${acc}40`, `0 0 0px ${acc}00`] }}
+              transition={{ duration: 3, repeat: Infinity, delay: 1 }}
             >
-              {word}
-            </motion.span>
-          ))}
-        </div>
-
-        <div className="max-w-7xl mx-auto relative z-10">
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <span className="section-label mb-6 inline-flex" style={{ background: `${acc}15`, borderColor: `${acc}30`, color: acc }}>
               <Zap size={12} />
               {discipline.tagline}
-            </span>
-            <h1 className="font-anton text-6xl md:text-8xl tracking-wider mb-6">
-              <span style={{ color: acc }}>{details.emoji} </span>
-              {discipline.name.toUpperCase()}
+            </motion.span>
+
+            {/* Emoji + name */}
+            <h1 className="font-anton tracking-wider leading-none mb-4" style={{ fontSize: 'clamp(3.5rem, 9vw, 8rem)' }}>
+              {slug === 'hybrid-athlete' ? (
+                <>
+                  <motion.span
+                    className="block"
+                    style={{ color: '#F5C518' }}
+                    initial={{ opacity: 0, x: -30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6, delay: 0.15 }}
+                  >
+                    HYBRID
+                  </motion.span>
+                  <motion.span
+                    className="block"
+                    style={{ color: acc }}
+                    initial={{ opacity: 0, x: 30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6, delay: 0.3 }}
+                  >
+                    ATHLETE
+                  </motion.span>
+                </>
+              ) : slug === 'hyrox' ? (
+                <>
+                  <motion.span className="block" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
+                    <span style={{ color: acc }}>🏆 </span>HYROX
+                  </motion.span>
+                  <motion.span
+                    className="block font-anton tracking-[0.2em]"
+                    style={{ fontSize: 'clamp(1rem, 2.5vw, 2.2rem)', color: acc, opacity: 0.8 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 0.8 }}
+                    transition={{ duration: 0.6, delay: 0.4 }}
+                  >
+                    8 KM · 8 STATIONS
+                  </motion.span>
+                </>
+              ) : (
+                <motion.span
+                  className="block"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.15 }}
+                >
+                  <span style={{ color: acc }}>{details.emoji} </span>
+                  {discipline.name.toUpperCase()}
+                </motion.span>
+              )}
             </h1>
-            <p className="text-xl max-w-2xl" style={{ color: 'var(--text-secondary)' }}>{details.description}</p>
+
+            {/* Punchline */}
+            <motion.p
+              className="font-semibold text-xl md:text-2xl mb-5 max-w-xl"
+              style={{ color: acc }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.35 }}
+            >
+              {hConf.punchline}
+            </motion.p>
+
+            {/* Description */}
+            <motion.p
+              className="text-base md:text-lg max-w-2xl leading-relaxed"
+              style={{ color: 'var(--text-secondary)' }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              {details.description}
+            </motion.p>
+
+            {/* CTA inline dans le hero */}
+            <motion.div
+              className="flex gap-4 mt-8 flex-wrap"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.65 }}
+            >
+              <Link to="/subscriptions" className="btn-primary flex items-center gap-2 px-6 py-3">
+                Commencer <ArrowRight size={14} />
+              </Link>
+              <Link to="/quiz" className="btn-outline flex items-center gap-2 px-6 py-3">
+                Faire le quiz <Zap size={14} />
+              </Link>
+            </motion.div>
           </motion.div>
         </div>
       </section>
